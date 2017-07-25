@@ -1,0 +1,53 @@
+<Configuration status="OFF">
+       <Appenders>
+              <Console name="Console" target="SYSTEM_OUT">
+                     <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+              </Console>
+              <RollingFile name="RollingFile" fileName="/data/logs/oms_server/oms_server.log"
+                           filePattern="/data/logs/oms_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
+                     <PatternLayout>
+                            <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+                     </PatternLayout>
+                     <Policies>
+                            <TimeBasedTriggeringPolicy />
+                            <SizeBasedTriggeringPolicy size="50 MB"/>
+                     </Policies>
+              </RollingFile>
+
+              <RollingFile name="RollingFileService" fileName="/data/logs/oms_server/oms_server_service.log"
+                           filePattern="/data/logs/oms_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i-fc.log">
+                     <PatternLayout>
+                            <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+                     </PatternLayout>
+                     <Policies>
+                            <TimeBasedTriggeringPolicy />
+                            <SizeBasedTriggeringPolicy size="20 MB"/>
+                     </Policies>
+              </RollingFile>
+
+              <RollingFile name="RollingFileController" fileName="/data/logs/oms_server/oms_server_controller.log"
+                           filePattern="/data/logs/oms_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i-pr.log">
+                     <PatternLayout>
+                            <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+                     </PatternLayout>
+                     <Policies>
+                            <TimeBasedTriggeringPolicy />
+                            <SizeBasedTriggeringPolicy size="20 MB"/>
+                     </Policies>
+              </RollingFile>
+       </Appenders>
+       <Loggers>
+              <Root level="INFO">
+                     <AppenderRef ref="Console"/>
+              </Root>
+              <Logger name="com.bdd.oms" level="INFO">
+                     <AppenderRef ref="RollingFile"/>
+              </Logger>
+              <Logger name="com.bdd.oms.*.service" level="INFO" additivity="false">
+                     <AppenderRef ref="RollingFileService"/>
+              </Logger>
+              <Logger name="com.bdd.oms.*.web" level="INFO" additivity="false">
+                     <AppenderRef ref="RollingFileController"/>
+              </Logger>
+       </Loggers>
+</Configuration>

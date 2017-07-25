@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!--使Spring支持自动检测组件，如注解的Controller -->
+    <!-- 启用spring mvc 注解 -->
+    <context:annotation-config/>
+    <!-- 默认的注解映射的支持 -->
+    <mvc:annotation-driven/>
+
+    <!-- 处理responseBody 里面日期类型 -->
+    <bean id="dateHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="jsonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper"/>
+        </property>
+    </bean>
+
+    <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/plain;charset=UTF-8</value>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+        <property name="writeAcceptCharset" value="false"/>
+    </bean>
+
+    <!-- 配置SpringMVC @ResponseBody和@RequestBody注解 -->
+    <bean
+            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <!-- json转换器 -->
+                <ref bean="jsonHttpMessageConverter"/>
+                <!-- 日期格式化 -->
+                <ref bean="dateHttpMessageConverter"/>
+                <!-- String -->
+                <ref bean="stringHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <context:component-scan base-package="top.apa7.*">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+
+    <!-- 对类名的约定支持 -->
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+
+    <!-- 根据客户端的不同的请求决定不同的view进行响应, 如 /blog/1.json /blog/1.xml -->
+    <bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <!-- 设置为true以忽略对Accept Header的支持 -->
+        <property name="ignoreAcceptHeader" value="true"/>
+        <!-- 在没有扩展名时即: "/blog/1" 时的默认展现形式 -->
+        <property name="defaultContentType" value="application/json"/>
+        <!-- 扩展名至mimeType的映射,即 /blog.json => application/json -->
+
+        <property name="mediaTypes">
+            <map>
+                <entry key="pdf" value="application/pdf;charset=UTF-8"/>
+                <entry key="xls" value="application/vnd.ms-excel; charset=UTF-8"/>
+                <entry key="xml" value="application/xml;charset=UTF-8"/>
+                <entry key="json" value="application/json;charset=UTF-8"/>
+                <entry key="ftl" value="text/html;charset=UTF-8"/>
+                <entry key="html" value="text/html;charset=UTF-8"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="viewResolvers">
+            <list>
+                <!-- FreeMarker视图解析 在这里配置后缀名ftl和视图解析器 -->
+                <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+                    <property name="viewClass"
+                              value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+                    <property name="prefix" value="/ftl"/>
+                    <property name="suffix" value=".ftl"/>
+                    <property name="exposeSpringMacroHelpers" value="true"/>
+                    <property name="exposeRequestAttributes" value="true"/>
+                    <property name="exposeSessionAttributes" value="true"/>
+                    <property name="contentType" value="text/html;charset=UTF-8"/>
+                    <property name="order" value="0"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- FreeMarker环境配置 -->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/ftl"/>
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="template_update_delay">2</prop>
+                <prop key="default_encoding">UTF-8</prop>
+                <prop key="output_encoding">UTF-8</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="number_format">0.####</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="time_format">HH:mm:ss</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="classic_compatible">true</prop>
+                <prop key="template_exception_handler">ignore</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 上传文件大小限制，单位字节 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="104857600"/>
+    </bean>
+
+    <!-- 定义spring MVC返回的路径 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:viewClass="org.springframework.web.servlet.view.JstlView" p:prefix="/WEB-INF/views/"
+          p:suffix=".jsp"/>
+
+</beans>
