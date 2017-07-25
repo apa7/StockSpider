@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="OFF">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <RollingFile name="RollingFile" fileName="/var/logs/tomcat/ws_server/ws_server.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileFund" fileName="/var/logs/tomcat/ws_server/ws_server_fund.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileAB" fileName="/var/logs/tomcat/ws_server/ws_server_ab.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFilePR" fileName="/var/logs/tomcat/ws_server/ws_server_pr.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i-pr.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileIT" fileName="/var/logs/tomcat/ws_server/ws_server_it.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i-it.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileInvestmentRecordController"
+                     fileName="/var/logs/tomcat/ws_server/ws_server_InvestmentRecordController.log"
+                     filePattern="/var/logs/tomcat/ws_server/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i-InvestmentRecordController.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="WARN">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="org.hibernate" level="warn">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.springframework" level="warn">
+            <AppendXerRef ref="Console"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server" level="warn">
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.userinfo.impl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFilePR"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.mylicai.impl.BaoBaoRecordServiceImpl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFilePR"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.mylicai.impl.InvestmentRecordServiceImpl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFilePR"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.mylicai.fund.FundProgressRecordProcessor" level="info" additivity="false">
+            <AppenderRef ref="RollingFileFund"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.ws.controller.userinfo.UserInfoController" level="warn" additivity="false">
+            <AppenderRef ref="RollingFilePR"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.data.dao.impl.InvestmentRecordDaoImpl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFilePR"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.accountbook.impl.AccountBookServiceImpl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFileAB"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.invite.impl" level="warn" additivity="false">
+            <AppenderRef ref="RollingFileIT"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.service.tx.RollbackDebugTransactionManager" level="warn" >
+            <AppenderRef ref="RollingFileAB"/>
+        </Logger>
+        <Logger name="com.daiyoubang.server.ws.controller.mylicai.irecord.InvestmentRecordController" level="fatal" >
+            <AppenderRef ref="RollingFileInvestmentRecordController"/>
+        </Logger>
+    </Loggers>
+</Configuration>
